@@ -1,4 +1,5 @@
 pipeline {
+
     agent any
 
     environment {
@@ -8,27 +9,28 @@ pipeline {
 
     stages {
 
-        stage('Checkout Code') {
+        stage('Checkout') {
             steps {
                 git branch: 'main',
-                    url: 'https://github.com/namrtavirdi/Docker-Project.git'
+                url: 'https://github.com/namrtavirdi/Docker-Project.git'
             }
         }
 
         stage('Verify Docker') {
             steps {
                 bat 'docker --version'
-                bat 'docker info'
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                bat 'docker build -t %IMAGE_NAME%:%IMAGE_TAG% .'
+                bat '''
+                docker build -t %IMAGE_NAME%:%IMAGE_TAG% .
+                '''
             }
         }
 
-        stage('Show Docker Images') {
+        stage('Show Images') {
             steps {
                 bat 'docker images'
             }
@@ -37,16 +39,19 @@ pipeline {
     }
 
     post {
+
         success {
-            echo '================================='
+            echo '==================================='
             echo 'Docker Image Built Successfully!'
-            echo '================================='
+            echo '==================================='
         }
 
         failure {
-            echo '================================='
-            echo 'Docker Build Failed!'
-            echo '================================='
+            echo '==================================='
+            echo 'Docker Build Failed'
+            echo '==================================='
         }
+
     }
+
 }
