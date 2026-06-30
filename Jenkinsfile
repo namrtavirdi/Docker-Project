@@ -1,57 +1,32 @@
 pipeline {
-
     agent any
-
-    environment {
-        IMAGE_NAME = "leaf-disease-app"
-        IMAGE_TAG = "latest"
-    }
 
     stages {
 
-        stage('Checkout') {
+        stage('Checkout Code') {
             steps {
-                git branch: 'main',
-                url: 'https://github.com/namrtavirdi/Docker-Project.git'
+                checkout scm
             }
         }
 
-        stage('Verify Docker') {
+        stage('Setup Python') {
             steps {
-                bat 'docker --version'
+                echo 'Setting up environment...'
+                bat 'python --version'
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Install Dependencies') {
             steps {
-                bat '''
-                docker build -t %IMAGE_NAME%:%IMAGE_TAG% .
-                '''
+                bat 'pip install -r requirements.txt'
             }
         }
 
-        stage('Show Images') {
+        stage('Run App') {
             steps {
-                bat 'docker images'
+                echo 'Starting application...'
+                bat 'python src\\app.py'
             }
         }
-
     }
-
-    post {
-
-        success {
-            echo '==================================='
-            echo 'Docker Image Built Successfully!'
-            echo '==================================='
-        }
-
-        failure {
-            echo '==================================='
-            echo 'Docker Build Failed'
-            echo '==================================='
-        }
-
-    }
-
 }
