@@ -3,30 +3,42 @@ pipeline {
 
     stages {
 
-        stage('Checkout Code') {
+        stage('Checkout') {
             steps {
                 checkout scm
             }
         }
 
-        stage('Setup Python') {
+        stage('Verify Docker') {
             steps {
-                echo 'Setting up environment...'
-                bat 'python --version'
+                bat 'docker --version'
             }
         }
 
-        stage('Install Dependencies') {
+        stage('Build Docker Image') {
             steps {
-                bat 'pip install -r requirements.txt'
+                bat 'docker build -t leaf-disease-app:latest .'
             }
         }
 
-        stage('Run App') {
+        stage('List Images') {
             steps {
-                echo 'Starting application...'
-                bat 'python src\\app.py'
+                bat 'docker images'
             }
+        }
+    }
+
+    post {
+        success {
+            echo '======================================='
+            echo 'Docker Image Built Successfully!'
+            echo '======================================='
+        }
+
+        failure {
+            echo '======================================='
+            echo 'Docker Build Failed!'
+            echo '======================================='
         }
     }
 }
